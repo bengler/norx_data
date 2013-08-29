@@ -13,17 +13,22 @@ cd ./tmp
 
 # Fetch and process N50 geojson into Postgresql
 
-#wget --user=bengler --password=data http://data.kartverket.no/bengler/geojson/Kartdata/n50.zip
-#unzip n50.zip
-#rm n50.zip
+echo "Fetching N50 geojson archive"
+
+wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/bengler/geojson/Kartdata/n50.zip
+unzip n50.zip
+rm n50.zip
+
+echo "Processing N50 geojson"
 
 for f in n50/*geojson;
   do
-	echo "Doing $f. Hang on.";
-	base="n50_$(basename $f .geojson)"
-	ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $base
+	table="n50_$(basename $f .geojson)"
+	echo "Dumping $f into table $DB_NAME.$table"
+	ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
+	rm $f
+	echo "Deleted $f"
 done
-
 
 # -------
 
@@ -42,5 +47,5 @@ done
 
 
 # Clean up
-#cd ..
-#rm -rf ./tmp
+cd ..
+rm -rf ./tmp
