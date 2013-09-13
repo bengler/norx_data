@@ -35,9 +35,19 @@ wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.n
 unzip SSR_stedsnavn.zip
 echo "Processing SSR"
 table="SSR"
-ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
+ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:4326' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
 
 
+echo "Fetching Administration limits"
+wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/bengler/geojson/Administrative_grenser.zip
+unzip Administrative_grenser.zip
+for f in abas/*geojson;
+  do
+	table="adm_areas_$(basename $f .geojson)"
+	echo "Dumping $f into table $DB_NAME.$table"
+	ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
+	echo "Deleted $f"
+done
 
 # Fetch and restore N50
 #wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/bengler/pgdump/n50_arealdekke.zip
