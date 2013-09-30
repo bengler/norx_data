@@ -7,4 +7,3 @@ CREATE INDEX idx_n50_vegsti_motorvegtype ON n50_vegsti (motorvegtype);
 CREATE INDEX idx_adm_areas_kommuner_navn ON adm_areas_kommuner (navn);
 CREATE INDEX idx_adm_areas_fylker_navn ON adm_areas_fylker (navn);
 CREATE INDEX idx_adm_areas_gkretsnavn ON adm_areas_grunnkretser (gkretsnavn);
-

@@ -29,14 +29,24 @@ for f in n50/*geojson;
 	# rm $f
 	# echo "Deleted $f"
 done
+cd n50
+table="n50_arealdekkeflate"
+for f in arealdekkeflate/*geojson;
+  do
+  echo "Dumping $f into table $DB_NAME.$table"
+  ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -append -nln $table
+  # rm $f
+  # echo "Deleted $f"
+done
+cd..
 
 echo "Fetching SSR"
 wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/stedsnavn/landsdekkende/Stedsavn_Norge_WGS84_geoJSON.zip
 unzip Stedsavn_Norge_WGS84_geoJSON.zip
 echo "Processing SSR"
-table="SSR"
-ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:4326' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
-
+table="ssr"
+ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:4326' -t_srs 'EPSG:4326' stedsnavn.geojson OGRGeoJSON -overwrite -nln $table
+# rm stedsnavn.geojson
 
 echo "Fetching Administration limits"
 wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/grensedata/landsdekkende/Grenser_Norge_WGS84_geoJSON.zip
@@ -46,8 +56,24 @@ for f in abas/*geojson;
 	table="adm_areas_$(basename $f .geojson)"
 	echo "Dumping $f into table $DB_NAME.$table"
 	ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
-	echo "Deleted $f"
 done
 
+echo "Fetching Administration limits"
+wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/grensedata/landsdekkende/Grenser_Norge_WGS84_geoJSON.zip
+unzip Grenser_Norge_WGS84_geoJSON.zip
+for f in abas/*geojson;
+  do
+  table="adm_areas_$(basename $f .geojson)"
+  echo "Dumping $f into table $DB_NAME.$table"
+  ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
+done
+
+
 cd ..
+
+echo "Postprocessing data in postgres"
+psql -d norx -a -f ./sql/fix_encoding.sql
+psql -d norx -a -f ./sql/create_indexes.sql
+
+
 #rm -rf ./tmp
