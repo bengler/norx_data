@@ -15,9 +15,9 @@ cd ./tmp
 
 echo "Fetching N50 geojson archive"
 
-wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/bengler/geojson/Kartdata/n50.zip
-unzip n50.zip
-rm n50.zip
+wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/kartdata/n50/landsdekkende/Kartdata_Norge_WGS84_N50_geoJSON.zip
+unzip Kartdata_Norge_WGS84_N50_geoJSON.zip
+rm Kartdata_Norge_WGS84_N50_geoJSON.zip
 
 echo "Processing N50 geojson"
 
@@ -26,21 +26,21 @@ for f in n50/*geojson;
 	table="n50_$(basename $f .geojson)"
 	echo "Dumping $f into table $DB_NAME.$table"
 	ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
-	rm $f
-	echo "Deleted $f"
+	# rm $f
+	# echo "Deleted $f"
 done
 
 echo "Fetching SSR"
-wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/bengler/geojson/SSR_stedsnavn.zip
-unzip SSR_stedsnavn.zip
+wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/stedsnavn/landsdekkende/Stedsavn_Norge_WGS84_geoJSON.zip
+unzip Stedsavn_Norge_WGS84_geoJSON.zip
 echo "Processing SSR"
 table="SSR"
 ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:4326' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
 
 
 echo "Fetching Administration limits"
-wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/bengler/geojson/Administrative_grenser.zip
-unzip Administrative_grenser.zip
+wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/grensedata/landsdekkende/Grenser_Norge_WGS84_geoJSON.zip
+unzip Grenser_Norge_WGS84_geoJSON.zip
 for f in abas/*geojson;
   do
 	table="adm_areas_$(basename $f .geojson)"
@@ -49,19 +49,5 @@ for f in abas/*geojson;
 	echo "Deleted $f"
 done
 
-# Fetch and restore N50
-#wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/bengler/pgdump/n50_arealdekke.zip
-#gunzip -c ./n50_arealdekke.zip | pg_restore -i -d "$DB_NAME" -v
-#rm n50_arealdekke.zip
-
-# Re-project N50 to WGS84
-#psql -d "$DB_NAME" -f ../sql/reproject_n50.sql
-
-# Fetch and bake administrative borders
-#wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/bengler/geojson/Administrative_grenser.zip
-#unzip Administrative_grenser.zip
-#rm Administrative_grenser.zip
-# Clean up
-
 cd ..
-rm -rf ./tmp
+#rm -rf ./tmp
