@@ -6,12 +6,12 @@ It assumes that you have a working environment with Postgresql >= 9.1, PostGIS >
 
 Also you need a PostGIS-2-enabled database to seed into. Give login options to this as arguments to the seed-script (see below).
 
-You will need at least 20GB free disk space, and at about 10GB swap to do this, as the GeoJSON-files are huge!
+You will need at least 20GB free disk space, and at about 15GB swap space to do this, as the GeoJSON-files are huge!
 
-## Performing the seed
+## Seeding the data
 
-```git clone https://github.com/bengler/kartverk_data_seed```
+```git clone https://github.com/bengler/norx_data /home/norx/data```
 
-```cd kartverk_data_seed```
+```cd /home/norx/data```
 
 ```./seed.sh [database_name] [database_user] [database_password]```
