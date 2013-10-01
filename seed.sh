@@ -3,8 +3,8 @@
 DB_NAME="$1"
 DB_USER="$2"
 DB_PASSWORD="$3"
-HTTP_USER="bengler"
-HTTP_PASSWORD="data"
+HTTP_USER="bengler" # This is, believe it or not, the official username at data.kartverket.no/betatest
+HTTP_PASSWORD="data" # And the password
 
 if [ ! -d "tmp" ]; then
   mkdir tmp
@@ -13,67 +13,103 @@ cd ./tmp
 
 # Fetch and process N50 geojson into Postgresql
 
-echo "Fetching N50 geojson archive"
+if [ ! -f '../.done_n50' ]; then
 
-wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/kartdata/n50/landsdekkende/Kartdata_Norge_WGS84_N50_geoJSON.zip
-unzip Kartdata_Norge_WGS84_N50_geoJSON.zip
-rm Kartdata_Norge_WGS84_N50_geoJSON.zip
+  echo "Fetching N50 geojson archive"
 
-echo "Processing N50 geojson"
+  wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/kartdata/n50/landsdekkende/Kartdata_Norge_WGS84_N50_geoJSON.zip
+  unzip Kartdata_Norge_WGS84_N50_geoJSON.zip
+  rm Kartdata_Norge_WGS84_N50_geoJSON.zip
 
-for f in n50/*geojson;
-  do
-	table="n50_$(basename $f .geojson)"
-	echo "Dumping $f into table $DB_NAME.$table"
-	ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
-	# rm $f
-	# echo "Deleted $f"
-done
-cd n50
-table="n50_arealdekkeflate"
-for f in arealdekkeflate/*geojson;
-  do
-  echo "Dumping $f into table $DB_NAME.$table"
-  ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -append -nln $table
-  # rm $f
-  # echo "Deleted $f"
-done
-cd..
+  echo "Processing N50 geojson"
 
-echo "Fetching SSR"
-wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/stedsnavn/landsdekkende/Stedsavn_Norge_WGS84_geoJSON.zip
-unzip Stedsavn_Norge_WGS84_geoJSON.zip
-echo "Processing SSR"
-table="ssr"
-ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:4326' -t_srs 'EPSG:4326' stedsnavn.geojson OGRGeoJSON -overwrite -nln $table
-# rm stedsnavn.geojson
+  for f in n50/*geojson;
+    do
+  	table="n50_$(basename $f .geojson)"
+  	echo "Dumping $f into table $DB_NAME.$table"
+  	ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
+  	# rm $f
+  	# echo "Deleted $f"
+  done
+  cd n50
+  table="n50_arealdekkeflate"
+  for f in arealdekkeflate/*geojson;
+    do
+    echo "Dumping $f into table $DB_NAME.$table"
+    ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -append -nln $table
+    # rm $f
+    # echo "Deleted $f"
+  done
+  cd..
+  touch ../.done_n50
+fi
 
-echo "Fetching Administration limits"
-wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/grensedata/landsdekkende/Grenser_Norge_WGS84_geoJSON.zip
-unzip Grenser_Norge_WGS84_geoJSON.zip
-for f in abas/*geojson;
-  do
-	table="adm_areas_$(basename $f .geojson)"
-	echo "Dumping $f into table $DB_NAME.$table"
-	ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
-done
+if [ ! -f '../.done_ssr' ]; then
 
-echo "Fetching Administration limits"
-wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/grensedata/landsdekkende/Grenser_Norge_WGS84_geoJSON.zip
-unzip Grenser_Norge_WGS84_geoJSON.zip
-for f in abas/*geojson;
-  do
-  table="adm_areas_$(basename $f .geojson)"
-  echo "Dumping $f into table $DB_NAME.$table"
-  ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
-done
+  echo "Fetching SSR"
+  wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/stedsnavn/landsdekkende/Stedsavn_Norge_WGS84_geoJSON.zip
+  unzip Stedsavn_Norge_WGS84_geoJSON.zip
+  echo "Processing SSR"
+  table="ssr"
+  ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:4326' -t_srs 'EPSG:4326' stedsnavn.geojson OGRGeoJSON -overwrite -nln $table
+  # rm stedsnavn.geojson
+  touch ../.done_ssr
+fi
 
+if [ ! -f '../.done_adm_limits' ]; then
+  echo "Fetching Administration limits"
+  wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/grensedata/landsdekkende/Grenser_Norge_WGS84_geoJSON.zip
+  unzip Grenser_Norge_WGS84_geoJSON.zip
+  for f in abas/*geojson;
+    do
+  	table="adm_areas_$(basename $f .geojson)"
+  	echo "Dumping $f into table $DB_NAME.$table"
+  	ogr2ogr -f  "PostgreSQL" PG:"host=localhost user=$DB_USER password=$DB_PASSWORD dbname=$DB_NAME" -s_srs 'EPSG:32633' -t_srs 'EPSG:4326' $f OGRGeoJSON -overwrite -nln $table
+  done
+  rm  -rf ./abas
+  touch ../.done_adm_limits
+fi
+
+
+rm -rf ./*
+
+if [ ! -f '../.done_terrain' ]; then
+  echo "Getting 10m terrain data"
+  wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD"  -r -np -nH –cut-dirs=3 -R index.html http://data.kartverket.no/betatest/terrengdata/10m
+
+  echo "Processsing utm32 dem files"
+  for f in betatest/terrengdata/10m/utm32/*zip;
+    do
+    unzip $f
+    rm $f
+  done
+  mkdir ../terrain/10m/original/sone32
+  mv *.dem ../terrain/10m/original/sone32
+
+  echo "Processsing utm33 dem files"
+  for f in betatest/terrengdata/10m/utm33/*zip;
+    do
+    unzip $f
+    rm $f
+  done
+  mkdir ../terrain/10m/original/sone33
+  mv *.dem ../terrain/10m/original/sone33
+
+  echo "Processsing utm35 dem files"
+  for f in betatest/terrengdata/10m/utm35/*zip;
+    do
+    unzip $f
+    rm $f
+  done
+  mkdir ../terrain/10m/original/sone35
+  mv *.dem ../terrain/10m/original/sone35
+
+  rm -rf betatest
+
+fi
 
 cd ..
 
-echo "Postprocessing data in postgres"
-psql -d norx -a -f ./sql/fix_encoding.sql
+echo "Adding indexes to postgres database"
 psql -d norx -a -f ./sql/create_indexes.sql
 
-
-#rm -rf ./tmp

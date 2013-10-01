@@ -6,7 +6,7 @@ It assumes that you have a working environment with Postgresql >= 9.1, PostGIS >
 
 Also you need a PostGIS-2-enabled database to seed into. Give login options to this as arguments to the seed-script (see below).
 
-You will need at least 20GB free disk space, and at about 15GB swap space to do this, as the GeoJSON-files are huge!
+You will need at least 20GB free disk space, and at about 30GB swap space to do this, as the GeoJSON-files are huge!
 
 ## Seeding the data
 

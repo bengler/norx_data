@@ -1,3 +1,5 @@
 tmp
 .DS_Store
-dtm
+terrain/10m/conversion/dtm_tiff/*
+terrain/10m/conversion/layers/*
+terrain/10m/original
