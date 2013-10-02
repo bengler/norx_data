@@ -17,7 +17,7 @@ if [ ! -f '../.done_n50' ]; then
 
   echo "Fetching N50 geojson archive"
 
-  wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/kartdata/n50/landsdekkende/Kartdata_Norge_WGS84_N50_geoJSON.zip
+  wget --quiet -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/kartdata/n50/landsdekkende/Kartdata_Norge_WGS84_N50_geoJSON.zip
   unzip Kartdata_Norge_WGS84_N50_geoJSON.zip
   rm Kartdata_Norge_WGS84_N50_geoJSON.zip
 
@@ -47,7 +47,7 @@ fi
 if [ ! -f '../.done_ssr' ]; then
 
   echo "Fetching SSR"
-  wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/stedsnavn/landsdekkende/Stedsavn_Norge_WGS84_geoJSON.zip
+  wget --quiet -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/stedsnavn/landsdekkende/Stedsavn_Norge_WGS84_geoJSON.zip
   unzip Stedsavn_Norge_WGS84_geoJSON.zip
   echo "Processing SSR"
   table="ssr"
@@ -58,7 +58,7 @@ fi
 
 if [ ! -f '../.done_adm_limits' ]; then
   echo "Fetching Administration limits"
-  wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/grensedata/landsdekkende/Grenser_Norge_WGS84_geoJSON.zip
+  wget --quiet -c --user="$HTTP_USER" --password="$HTTP_PASSWORD" http://data.kartverket.no/betatest/grensedata/landsdekkende/Grenser_Norge_WGS84_geoJSON.zip
   unzip Grenser_Norge_WGS84_geoJSON.zip
   for f in abas/*geojson;
     do
@@ -75,7 +75,7 @@ rm -rf ./*
 
 if [ ! -f '../.done_terrain' ]; then
   echo "Getting 10m terrain data"
-  wget -c --user="$HTTP_USER" --password="$HTTP_PASSWORD"  -r -np -nH –cut-dirs=3 -R index.html http://data.kartverket.no/betatest/terrengdata/10m
+  wget --quiet -c --user="$HTTP_USER" --password="$HTTP_PASSWORD"  -r -np -nH –cut-dirs=3 -R index.html http://data.kartverket.no/betatest/terrengdata/10m
 
   echo "Processsing utm32 dem files"
   for f in betatest/terrengdata/10m/utm32/*zip;
@@ -105,7 +105,7 @@ if [ ! -f '../.done_terrain' ]; then
   mv *.dem ../terrain/10m/original/sone35
 
   rm -rf betatest
-
+  cd ../terrain/10m/conversion
 fi
 
 cd ..
