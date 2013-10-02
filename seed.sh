@@ -106,10 +106,10 @@ if [ ! -f '../.done_terrain' ]; then
 
   rm -rf betatest
   cd ../terrain/10m/conversion
+  sudo -u $name ./convert.sh
 fi
 
-cd ..
+cd /home/$name/services
 
 echo "Adding indexes to postgres database"
 psql -d norx -a -f ./sql/create_indexes.sql
-
