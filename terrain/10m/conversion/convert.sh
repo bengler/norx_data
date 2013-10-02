@@ -3,10 +3,8 @@ echo "Reproject utm32, convert to tiff";
 export GDAL_CACHEMAX=8000
 
 utm33_dir="../original"
-layer_dir="./layers"
-
-OIFS="$IFS"
-IFS=$'\n' 
+layer_dir="./layers" 
+odir="./dtm_tiff"
 
 if [ ! -d "$odir" ]; then
   mkdir "$odir"
@@ -21,6 +19,7 @@ for f in $utm33_dir/sone32/*.dem;
     if [ ! -f "$odir/$base.tif" ]
     then
       gdalwarp -wm 8000 -r bilinear -s_srs EPSG:32632 -t_srs EPSG:32633 -dstnodata -32768 -co "TILED=YES" -co COMPRESS=DEFLATE -co ZLEVEL=9 -r bilinear -of GTiff $f "$odir/$base.tif"
+      rm $f
     else
       echo "! File $f is already converted."
     fi
@@ -36,6 +35,7 @@ for f in $utm33_dir/sone35/*.dem;
     if [ ! -f "$odir/$base.tif" ]
     then
       gdalwarp -wm 8000 -r bilinear -s_srs EPSG:32635 -t_srs EPSG:32633 -dstnodata -32768 -co "TILED=YES" -co COMPRESS=DEFLATE -co ZLEVEL=9 -r bilinear -of GTiff $f "$odir/$base.tif" 
+      rm $f
     else
       echo "! File $f is already converted."
     fi
@@ -52,6 +52,7 @@ for f in $utm33_dir/sone33/*.dem;
     if [ ! -f "$odir/$base.tif" ]
     then
       gdal_translate -of GTiff -a_nodata -32768 -co "TILED=YES" -co COMPRESS=DEFLATE -co ZLEVEL=9 $f "$odir/$base.tif"
+      rm $f
     else
       echo "File $f is already converted."
     fi
