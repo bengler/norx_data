@@ -65,7 +65,8 @@ for f in $odir/*.tif;
   do 
     echo "Doing $f. Hang on."; 
     base=$(basename $f .dem)
-    gdaladdo -r average --config COMPRESS_OVERVIEW DEFLATE $f 2 4 8 16 32 64
+    #gdaladdo -r average --config COMPRESS_OVERVIEW DEFLATE $f 2 4 8 16 32 64
+    gdaladdo -r average --config COMPRESS_OVERVIEW JPEG --config JPEG_QUALITY_OVERVIEW 90 $f 2 4 8 16 32 64
 done
 
 echo "Build vrt $odir"; 
