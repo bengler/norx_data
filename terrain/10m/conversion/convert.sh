@@ -2,7 +2,7 @@ echo "Reproject utm32, convert to tiff";
 
 export GDAL_CACHEMAX=8000
 
-utm33_dir="../original"
+dem_dir="../original"
 layer_dir="./layers" 
 odir="./dtm_tiff"
 
@@ -11,7 +11,7 @@ if [ ! -d "$odir" ]; then
 fi
 
 
-for f in $utm33_dir/sone32/*.dem; 
+for f in $dem_dir/sone32/*.dem; 
   do 
     echo "Doing $f. Hang on."; 
     base=$(basename $f .dem)
@@ -27,7 +27,7 @@ done
 
 echo "Reproject utm35, convert to tiff"; 
 
-for f in $utm33_dir/sone35/*.dem; 
+for f in $dem_dir/sone35/*.dem; 
   do 
     echo "Doing $f. Hang on."; 
     base=$(basename $f .dem)
@@ -44,7 +44,7 @@ done
 
 echo "Convert utm33 DEM tiles to tiff"; 
 
-for f in $utm33_dir/sone33/*.dem; 
+for f in $dem_dir/sone33/*.dem; 
   do 
     echo "Doing $f. Hang on."; 
     base=$(basename $f .dem)
