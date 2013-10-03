@@ -108,7 +108,7 @@ if [ ! -f '../.done_terrain' ]; then
 
   rm -rf betatest
   cd ../terrain/10m/conversion
-  sudo -u $name ./convert.sh
+  sudo -u norx ./convert.sh
 fi
 
 cd /home/$name/services
