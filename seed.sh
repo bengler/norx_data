@@ -111,7 +111,7 @@ if [ ! -f '../.done_terrain' ]; then
   sudo -u norx ./convert.sh
 fi
 
-cd /home/$name/services
+cd /home/norx/data
 
 echo "Adding indexes to postgres database"
 psql -d norx -a -f ./sql/create_indexes.sql
