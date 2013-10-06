@@ -11,9 +11,20 @@ if [ ! -d "tmp" ]; then
 fi
 cd ./tmp
 
+
+# Create swapfile of 30GB with block size 1MB
+dd if=/dev/zero of=/swapfile bs=1024 count=31457280
+# Set up the swap file
+mkswap /swapfile
+
+# Enable swap file immediately
+swapon /swapfile
+
 # Fetch and process N50 geojson into Postgresql
 
 if [ ! -f '../.done_n50' ]; then
+
+  echo "    * Generating and activating humongous!! (30 GB) swapfile needed to parse BIG GeoJSON files. Some of these JSON files are as big as 12 GB!"
 
   echo "Fetching N50 geojson archive"
 
@@ -73,7 +84,21 @@ fi
 
 rm -rf ./*
 
+echo "    * Deactivating and removing swap file"
+swapoff /swapfile
+rm -rf /swapfile  
+
+# Create swapfile of 10GB with block size 1MB
+dd if=/dev/zero of=/swapfile bs=1024 count=10485760
+# Set up the swap file
+mkswap /swapfile
+
+# Enable swap file immediately
+swapon /swapfile
+
 if [ ! -f '../.done_terrain' ]; then
+
+
   echo "Getting 10m terrain data"
   wget --quiet -c --user="$HTTP_USER" --password="$HTTP_PASSWORD"  -r -np -nH –cut-dirs=3 -R index.html http://data.kartverket.no/betatest/terrengdata/10m/
 
@@ -115,3 +140,7 @@ cd /home/norx/data
 
 echo "Adding indexes to postgres database"
 psql -d norx -a -f ./sql/create_indexes.sql
+
+echo "    * Deactivating and removing swap file"
+swapoff /swapfile
+rm -rf /swapfile  
