@@ -28,7 +28,7 @@ done
 echo "Reproject utm35, convert to tiff"
 
 for f in $dem_dir/sone35/*.dem
-  do 
+  do
     echo "Doing $f. Hang on."
     base=$(basename $f .dem)
 
