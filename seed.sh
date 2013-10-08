@@ -51,7 +51,7 @@ if [ ! -f '../.done_n50' ]; then
     # rm $f
     # echo "Deleted $f"
   done
-  cd..
+  cd ..
   sudo -u $DB_USER touch ../.done_n50
 fi
 
