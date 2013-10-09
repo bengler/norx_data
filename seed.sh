@@ -88,14 +88,6 @@ echo "    * Deactivating and removing swap file"
 swapoff /swapfile
 rm -rf /swapfile
 
-# Create swapfile of 10GB with block size 1MB
-dd if=/dev/zero of=/swapfile bs=1024 count=10485760
-# Set up the swap file
-mkswap /swapfile
-
-# Enable swap file immediately
-swapon /swapfile
-
 if [ ! -f '../.done_terrain' ]; then
 
 
@@ -133,7 +125,16 @@ if [ ! -f '../.done_terrain' ]; then
 
   rm -rf betatest
   cd ../terrain/10m/conversion
+  # Create swapfile of 10GB with block size 1MB
+  dd if=/dev/zero of=/swapfile bs=1024 count=10485760
+  # Set up the swap file
+  mkswap /swapfile
+  # Enable swap file immediately
+  swapon /swapfile
   sudo -u $DB_USER ./convert.sh
+  echo "    * Deactivating and removing swap file"
+  swapoff /swapfile
+  rm -rf /swapfile
 fi
 
 cd /home/norx/data
@@ -141,6 +142,3 @@ cd /home/norx/data
 echo "Adding indexes to postgres database"
 sudo -u $DB_USER psql -d $DB_NAME -a -f ./sql/create_indexes.sql
 
-echo "    * Deactivating and removing swap file"
-swapoff /swapfile
-rm -rf /swapfile
