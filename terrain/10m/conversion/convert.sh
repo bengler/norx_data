@@ -81,27 +81,19 @@ fi
 echo "Color relief"
 
 echo "$layer_dir/color_relief.tiff"
-gdaldem color-relief dtm.vrt stylesheets/color-ramps/color_ramp.txt "$layer_dir/color_relief.tiff" -of GTiff -co COMPRESS=JPEG -co JPEG_QUALITY=90
+gdaldem color-relief dtm.vrt stylesheets/color-ramps/color_ramp.txt "$layer_dir/color_relief.tiff" -of GTiff -co COMPRESS=JPEG -co JPEG_QUALITY=90 -co TILED=YES
 
 echo "Hillshade"
 
-gdaldem hillshade dtm.vrt ./layers/hillshade.tiff -of GTiff -co COMPRESS=JPEG -co JPEG_QUALITY=90  -compute_edges
+gdaldem hillshade dtm.vrt ./layers/hillshade.tiff -of GTiff -co COMPRESS=JPEG -co JPEG_QUALITY=90 -co TILED=YES -compute_edges
 
 echo "And finally slope"
 
 gdaldem slope dtm.vrt layers/slope.tiff -of GTiff -compute_edges
-gdaldem color-relief -co compress=JPEG -co BIGTIFF=YES -co JPEG_QUALITY=90 -of GTiff layers/slope.tiff stylesheets/slope-ramp.txt layers/slopes_shade_deflate.tiff
+gdaldem color-relief -co compress=JPEG -co BIGTIFF=YES -co JPEG_QUALITY=90 -co TILED=YES -of GTiff layers/slope.tiff stylesheets/slope-ramp.txt layers/slopes_shade_deflate.tiff
 
 echo "Then generate pyramids for shading rasters"
 
 gdaladdo -r average --config COMPRESS_OVERVIEW JPEG --config JPEG_QUALITY_OVERVIEW 90 $layer_dir/hillshade.tiff 2 4 8 16 32 64 128
 gdaladdo -r average --config COMPRESS_OVERVIEW JPEG --config JPEG_QUALITY_OVERVIEW 90 $layer_dir/color_relief.tiff 2 4 8 16 32 64 128
-gdaladdo -r average --config COMPRESS_OVERVIEW JPEG --config JPEG_QUALITY_OVERVIEW 90 $layer_dir/slopes_shade.tiff 2 4 8 16 32 64 128
-
-
-
-# echo "Merge to single raster"
-# gdal_merge.py -o $layer_dir/merged.tiff -n 32768 -co COMPRESS=DEFLATE `find dtm_tiff -name "*.tif"`
-# echo "Generate pyramids for single raster"
-# gdaladdo -r --config COMPRESS_OVERVIEW DEFLATE average $layer_dir/merged.tiff 2 4 8 16 32 64
-
+gdaladdo -r average --config COMPRESS_OVERVIEW JPEG --config JPEG_QUALITY_OVERVIEW 90 $layer_dir/slopes_shade_deflate.tiff 2 4 8 16 32 64 128
