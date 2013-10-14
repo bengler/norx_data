@@ -92,7 +92,7 @@ if [ ! -f '../.done_terrain' ]; then
 
 
   echo "Getting 10m terrain data"
-  sudo -u $DB_USER wget --quiet -c --user="$HTTP_USER" --password="$HTTP_PASSWORD"  -r -np -nH –cut-dirs=3 -R index.html http://data.kartverket.no/betatest/terrengdata/10m/
+  sudo -u $DB_USER wget --quiet -c --user="$HTTP_USER" --password="$HTTP_PASSWORD"  -r -np -nH --cut-dirs=3 -R index.html http://data.kartverket.no/betatest/terrengdata/10m/
 
   sudo -u $DB_USER mkdir ../terrain/10m/original
 
